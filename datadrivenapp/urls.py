@@ -9,6 +9,8 @@ urlpatterns = [
 	url(r'^$', index, name='index'),
 	## SETUP URLS ##
 	url(r'^setup/$', index_setup, name='index_setup'),
+	url(r'^dedupe/$', vwDedupe, name='dedupe'),
+	url(r'^results/$', vwResults, name='results'),
 	## VIEWING URLS ##
 	url(r'^view-data/$', index_view, name='index_view'),
 	## TRANSACTIONS URLS ##

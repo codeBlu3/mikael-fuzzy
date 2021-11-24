@@ -1,0 +1,96 @@
+{% extends 'datadrivenapp/home.html' %}
+{% block content %}
+
+<section class="content-header">
+      <h1>
+        MIKAEL
+        <small>Data Setup</small>
+        <br>
+   </section>
+<!-- Main content -->
+<section class="content container-fluid">
+
+<div class="container-fluid">
+		       
+      <br>
+<div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Data Upload</h3>
+        </div>
+        <div class="box-body">
+          <div class="row">
+            <div class="col-md-6">
+          <div class="card card-primary">
+            <div class="card-body">
+              <div class="card-body">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <div class="custom-file">
+                        <form method="post" enctype="multipart/form-data" action="">
+			{% csrf_token %}
+                        <input type="file" name="fileOne" class="custom-file-input" id="exampleInputFile">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+          </div>
+          <!-- /.card -->
+        </div>
+
+        <div class="col-md-6">
+            <!-- Form Element sizes -->
+                       <!-- /.card -->
+</form>
+
+          </div>
+
+            </div>
+        </div>
+
+        <div class="box-footer">
+          <strong>Copyright &copy; 2020.</strong> All rights reserved.
+        </div>
+      </div>
+
+</section>
+    {% endblock content %}
+{% block js %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+
+
+<script>
+  $(function () {
+    //Date range picker
+    $('#reservation').daterangepicker()
+
+    $('#removeBtn').click(function(){
+    $(this).parents('tr').first().remove();
+});
+
+    function checkDOB() {
+      var dateString = document.getElementById('dateto').value;
+      var myDate = new Date(dateString);
+      var today = new Date();
+      if ( myDate > today ) { 
+        $('#id_dateOfBirth').after('<p>You cannot enter a date in the future!.</p>');
+        return false;
+      }
+      return true;
+    }
+</script>
+
+   {% endblock js %}
+
+
+
+

@@ -76,7 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'datadriven.wsgi.application'
 
 MEDIA_URL = 'datadriven/media/'
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
