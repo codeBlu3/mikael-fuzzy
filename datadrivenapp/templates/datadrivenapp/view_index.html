@@ -1,0 +1,110 @@
+{% extends 'datadrivenapp/home.html' %}
+{% block content %}
+
+<section class="content-header">
+      <h1>
+        MIKAEL
+        <small>View Data</small>
+        <br>
+    </section>
+<!-- Main content -->
+
+<section class="content container-fluid">
+
+<div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">View Data
+            <br><small>Select to view available data for each of the data sources.</small></h3>
+        </div>
+        <div class="box-body">
+          <div class="row">
+            <div class="col-md-12">
+              <!-- <div class="form-group"> -->
+                <!-- <div class="btn-group col-md-12"> -->
+                      {% csrf_token %}
+                    <div class="form-group">
+                    <br>
+                    <br>
+                </div><!-- 
+                <br>
+                <br>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-danger col-md-12" value="View LandBank Data">
+                </div> -->
+                    <!-- <div class="form-group">
+                      <label for="setup_lbp_year">Year:</label>
+                      <select class="selectpicker form-control col-md-12 form-control edit" id="engas_year" name="engas_year">
+                        <option>2017</option>
+                        <option>2018</option>
+                        <option>2019</option>
+                      </select>
+                    </div> -->
+                    <!-- <div class="form-group">
+                      <label for="db_password">Password:</label>
+                      <input type="password" id="password" name="password" class="form-control col-md-6">
+                    </div> -->                  
+                <!-- </div> -->
+              <!-- </div> -->
+             </div>
+            </div>
+        </div>
+                  <div class="box-footer">
+          <strong>Copyright &copy; 2020.</strong> All rights reserved.
+        </div>
+      </div>
+<!-- 
+    <div id="resultDiv" class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title">LandBank of the Philippines
+              <br><small>Fetch data from LBP Database</small></h3>
+        </div>
+        <div class="box-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <div class="btn-group col-md-12">
+                    <div class="form-group">
+                      <label for="setup_lbp">Agency:</label>
+                      <select class="selectpicker form-control col-md-12 form-control edit" id="agency" name="agency" data-live-search="true">
+                        <option>City Government of Muntinlupa</option>
+                        <option>City Government of Quezon City</option>
+                        <option>Commission on Elections - COMELEC</option>
+                        <option>Department of Science and Technology - DOST</option>
+                        <option>Philippine Overseas Employment and Administration - POEA</option>
+                      </select>
+                      <br>
+                    </div>
+                    <div class="form-group">
+                      <label for="setup_lbp_year">Year:</label>
+                      <select class="selectpicker form-control col-md-12 form-control edit" id="engas_year" name="engas_year">
+                        <option>2017</option>
+                        <option>2018</option>
+                        <option>2019</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                    <input type="submit" class="btn btn-danger col-md-12" value="Get Data">
+                </div>
+                  </form>
+
+                  
+                </div>
+              </div>
+             </div>
+            </div>
+        </div>
+          <div class="box-footer">
+          <strong>Copyright &copy; 2020.</strong> All rights reserved.
+        </div>
+        </div> -->
+</section>
+
+    {% endblock content %}
+   {% block js %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+
+   {% endblock js %}
