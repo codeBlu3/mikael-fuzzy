@@ -28,161 +28,163 @@ import networkx as nx
 
 
 def pickleOut(obj, fname):
-	fout =  open(fname, 'wb')
-	pickle.dump(obj, fout)
-	fout.close()
-	print(f'object was successfully exported to {fname}')
+    fout =  open(fname, 'wb')
+    pickle.dump(obj, fout)
+    fout.close()
+    print(f'object was successfully exported to {fname}')
 
 def pickleIn(fname):
-	fIn =  open(fname, 'rb')
-	obj = pickle.load(fIn)
-	fIn.close()
-	print(f'object {fname} was successfully imported  ')
-	return obj
+    fIn =  open(fname, 'rb')
+    obj = pickle.load(fIn)
+    fIn.close()
+    print(f'object {fname} was successfully imported  ')
+    return obj
 
 def fixStrTextNorm(dstr):
-	dstr = fix_text(dstr)
-	dstr = dstr.lower()
-	dstr = dstr.replace('|', '')
-	dstr = dstr.strip()
-	return dstr 
+    dstr = fix_text(dstr)
+    dstr = dstr.lower()
+    dstr = dstr.replace('|', '')
+    dstr = dstr.strip()
+    return dstr 
 
 def dfObjColConverter(df, ltcols):
-	for col in ltcols:
-		if df[col].dtype == 'object':
-			df[col] = df[col].fillna('') 
-			df[col]  =  df[col].astype('str').apply(fixStrTextNorm)
-	return df
+    for col in ltcols:
+        if df[col].dtype == 'object':
+            df[col] = df[col].fillna('') 
+            df[col]  =  df[col].astype('str').apply(fixStrTextNorm)
+    return df
 
 def compNameGenerator(df, ltcols, sep = '| ' ):    
-	return  df[ltcols].apply(lambda x: sep.join(x.dropna().astype(str).values), axis=1) 
+    return  df[ltcols].apply(lambda x: sep.join(x.dropna().astype(str).values), axis=1) 
 
 def ngrams(string, n=3):
-	string = re.sub(r'[,-./|]',r'', string)
-	ngrams = zip(*[string[i:] for i in range(n)])
-	return [''.join(ngram) for ngram in ngrams]
+    string = re.sub(r'[,-./|]',r'', string)
+    ngrams = zip(*[string[i:] for i in range(n)])
+    return [''.join(ngram) for ngram in ngrams]
 
 def dfMatchesTodDupID(df):
-	g = nx.from_pandas_edgelist(df, 'DatabaseData', 'QueryData')
-	ltconx = [{'compname': list(it)} for it in nx.connected_components(g)]
-	dfgroup = pd.DataFrame(ltconx)
-	dfgroup['groupID'] = dfgroup.index
-	dfduptracker = dfgroup.explode('compname')
-	return dfduptracker 
+    g = nx.from_pandas_edgelist(df, 'DatabaseData', 'QueryData')
+    ltconx = [{'compname': list(it)} for it in nx.connected_components(g)]
+    dfgroup = pd.DataFrame(ltconx)
+    dfgroup['groupID'] = dfgroup.index
+    dfduptracker = dfgroup.explode('compname')
+    return dfduptracker 
 
 
 ## DASHBOARD ##
 
 def index(request):
-	template = "datadrivenapp/dashboard.html"
+    template = "datadrivenapp/dashboard.html"
 
-	context = { 
+    context = { 
 
-			}
+            }
 
-	return render(request, template, context)
+    return render(request, template, context)
 
 ## TRANSACTIONS ##
 
 def index_trans(request):
-	template = "datadrivenapp/index_trans.html"
+    template = "datadrivenapp/index_trans.html"
 
-	# sector = Agency.objects.values('SECTOR').distinct()
-	# trans = Transaction.objects.values('DESCRIPTION').distinct().filter(DESCRIPTION__in = ['Disbursement', 'Collections'])
-	agency = Agency.objects.all()  #agency = Agency.objects.all().filter(AGENCYCODE = 'CHED')
+    # sector = Agency.objects.values('SECTOR').distinct()
+    # trans = Transaction.objects.values('DESCRIPTION').distinct().filter(DESCRIPTION__in = ['Disbursement', 'Collections'])
+    agency = Agency.objects.all()  #agency = Agency.objects.all().filter(AGENCYCODE = 'CHED')
 
-	context = { 
-			"agency": agency
-			}
+    context = { 
+            "agency": agency
+            }
 
-	return render(request, template, context)
+    return render(request, template, context)
 
 def data_match(request):
-	template = "datadrivenapp/index_trans.html"
+    template = "datadrivenapp/index_trans.html"
 
-	context = { 
-			"agency": agency
-			}
+    context = { 
+            "agency": agency
+            }
 
-	return render(request, template, context)
+    return render(request, template, context)
 
 ## EXCEL FILE UPLOAD ##
 
 def index_setup(request):
-	if request.method == 'POST' and request.FILES['fileOne'] :
-		fileOne = request.FILES['fileOne']
-		fs = FileSystemStorage()
-		os.remove(os.getcwd()+'/media/upload.csv')
-		filename = fs.save('upload.csv', fileOne)
-		uploaded_file_url = fs.url(filename)
-		response = redirect('/results')
-		return response
+    if request.method == 'POST' and request.FILES['fileOne'] :
+        fileOne = request.FILES['fileOne']
+        fs = FileSystemStorage()
+        os.remove(os.getcwd()+'/media/upload.csv')
+        filename = fs.save('upload.csv', fileOne)
+        uploaded_file_url = fs.url(filename)
+        response = redirect('/dedupe')
+        return response
 
 
-	template = "datadrivenapp/setup.html"
+    template = "datadrivenapp/setup.html"
 
-	context = { 
+    context = { 
 
-			}
-	return render(request, template, context)
+            }
+    return render(request, template, context)
 
 
 
 def vwDedupe(request):
-	if request.method == 'POST' and request.FILES['fileOne'] :
-		# knn Code should be here
-		fileOne = request.FILES['fileOne']
-		fs = FileSystemStorage()
-		os.remove(os.getcwd()+'/media/upload.csv')
-		filename = fs.save('upload.csv', fileOne)
-		uploaded_file_url = fs.url(filename)
-		response = redirect('/results')
-		return response
+    if request.method == 'POST' :
+        # knn Code should be here
+        df = pd.read_csv(os.getcwd()+'/media/upload.csv')
+        ltColumns  = sorted(list(df.columns))
+        ltColumnsToMatch  = [ key for key in request.POST.keys() if key in ltColumns]
+        ltColumnsToMatch  = sorted(ltColumnsToMatch)
+        df =  dfObjColConverter(df, ltColumnsToMatch)
+        df['compname'] = compNameGenerator(df, ltColumnsToMatch)
+        dfdb =  df.compname.drop_duplicates()
+        vectorizer = TfidfVectorizer(min_df=1, analyzer=ngrams)
+        db_tf_idf_matrix = vectorizer.fit_transform(dfdb)
+        knn = NearestNeighbors(n_neighbors=10 , metric = 'cosine' )
+        knn.fit(db_tf_idf_matrix)
+        D, I = knn.kneighbors(db_tf_idf_matrix, 10)  
+
+        matches = []
+        for r,indVals in enumerate(I):
+            for c, dbloc in enumerate(indVals):
+                temp = [D[r][c], dfdb.iloc[dbloc], dfdb.iloc[r]]
+                matches.append(temp)
+
+        dfmatches = pd.DataFrame(matches, columns = ['Kdistance','DatabaseData','QueryData'])
+        dfmatches = dfmatches[dfmatches['Kdistance'] > 0.000000001].sort_values('Kdistance', ascending = True)
+        resfname = os.getcwd()+'/pkl/results.pkl'
+        os.remove(resfname)
+        pickleOut(dfmatches, resfname)
+        
 
 
-	df = pd.read_csv(os.getcwd()+'/media/upload.csv')
-	ltColumns  = list(df.columns)
-	template = "datadrivenapp/dedupe.html"
+        response = redirect('/results')
+        return response
+
+
+    df = pd.read_csv(os.getcwd()+'/media/upload.csv')
+    ltColumns  = sorted(list(df.columns))
+    template = "datadrivenapp/dedupe.html"
 
 
 
-	context = { 
-			'ltColumns': ltColumns,
-			}
-	return render(request, template, context)
-
-
+    context = { 
+            'ltColumns': ltColumns,
+            }
+    return render(request, template, context)
 
 
 
 def vwResults(request):
-	df = pd.read_csv(os.getcwd()+'/media/upload.csv')
-	ltColumns  = list(df.columns)
-	ltColumnsToMatch  = ['first_name', 'mid_name', 'last_name']
-	df =  dfObjColConverter(df, ltColumnsToMatch)
-	df['compname'] = compNameGenerator(df, ltColumnsToMatch)
-	dfdb =  df.compname.drop_duplicates()
-	vectorizer = TfidfVectorizer(min_df=1, analyzer=ngrams)
-	db_tf_idf_matrix = vectorizer.fit_transform(dfdb)
-	knn = NearestNeighbors(n_neighbors=10 , metric = 'cosine' )
-	knn.fit(db_tf_idf_matrix)
-	D, I = knn.kneighbors(db_tf_idf_matrix, 10)  
 
-	matches = []
-	for r,indVals in enumerate(I):
-		for c, dbloc in enumerate(indVals):
-			temp = [D[r][c], dfdb.iloc[dbloc], dfdb.iloc[r]]
-			matches.append(temp)
+    resfname = os.getcwd()+'/pkl/results.pkl'
+    dfmatches = pickleIn(resfname)
 
-	dfmatches = pd.DataFrame(matches, columns = ['Kdistance','DatabaseData','QueryData'])
-	dfmatches = dfmatches[dfmatches['Kdistance'] > 0.000000001].sort_values('Kdistance', ascending = True)
-
-
-	template = "datadrivenapp/results.html"
-	context = { 
-			'dfmatches': dfmatches,
-			}
-	return render(request, template, context)
+    template = "datadrivenapp/results.html"
+    context = { 
+            'dfmatches': dfmatches,
+            }
+    return render(request, template, context)
 
 
 
@@ -193,20 +195,20 @@ def vwResults(request):
 
 
 def file_upload(request):
-	if request.method == 'POST' and request.FILES['fileOne'] and request.FILES['fileTwo']:
-		fileOne = request.FILES['fileone']
-		fileTwo = request.FILES['filetwo']
-		fs = FileSystemStorage()
-		filenameOne = fs.save(fileOne.name, fileone)
-		filenameTwo = fs.save(fileTwo.name, filetwo)
-		uploaded_file_url = fs.url(filename)
-		return render(request, 'datadrivenapp/view_index.html', {
-			'uploaded_file_url': uploaded_file_url
-			})
+    if request.method == 'POST' and request.FILES['fileOne'] and request.FILES['fileTwo']:
+        fileOne = request.FILES['fileone']
+        fileTwo = request.FILES['filetwo']
+        fs = FileSystemStorage()
+        filenameOne = fs.save(fileOne.name, fileone)
+        filenameTwo = fs.save(fileTwo.name, filetwo)
+        uploaded_file_url = fs.url(filename)
+        return render(request, 'datadrivenapp/view_index.html', {
+            'uploaded_file_url': uploaded_file_url
+            })
 
-	template = "datadrivenapp/view_index.html"
+    template = "datadrivenapp/view_index.html"
 
-	return render(request, template)
+    return render(request, template)
 
 
 
@@ -214,13 +216,13 @@ def file_upload(request):
 ## REPORTS ## 
 
 def index_view(request):
-	template = "datadrivenapp/view_index.html"
+    template = "datadrivenapp/view_index.html"
 
-	context = { 
+    context = { 
 
-			}
+            }
 
-	return render(request, template, context)
+    return render(request, template, context)
 
 
 
@@ -229,10 +231,10 @@ def index_view(request):
 '''
 
 
-	context = { 
+    context = { 
 
-	}
-	return render(request, template, context)
+    }
+    return render(request, template, context)
 
 
 '''
