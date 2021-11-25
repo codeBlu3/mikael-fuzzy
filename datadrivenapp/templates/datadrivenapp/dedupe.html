@@ -15,7 +15,7 @@
       <br>
 <div class="box">
         <div class="box-header with-border">
-          <h3 class="box-title">Data Upload</h3>
+          <h3 class="box-title">Select Columns for Deduplication</h3>
         </div>
         <div class="box-body">
           <div class="row">
@@ -26,9 +26,11 @@
                   <div class="form-group">
                     <div class="input-group">
                       <div class="custom-file">
-                        <form method="post" enctype="multipart/form-data" action="">
+                        <form method="post" action="">
 			{% csrf_token %}
-                        <input type="file" name="fileOne" class="custom-file-input" id="exampleInputFile">
+               {% for it  in ltColumns %}
+			<li><label ><input type="checkbox" id="foo_1" value="{{it}}" name="{{it}}">{{it}} </label></li>
+               {% endfor %} 
                       </div>
                     </div>
                   </div>
@@ -36,7 +38,7 @@
             </div>
             <!-- /.card-body -->
             <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn btn-primary">Deduplicate</button>
                 </div>
 
           </div>
