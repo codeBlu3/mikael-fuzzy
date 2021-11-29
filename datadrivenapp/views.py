@@ -131,13 +131,14 @@ def index_setup(request):
 def vwDedupe(request):
     if request.method == 'POST' :
         # knn Code should be here
-        df = pd.read_csv(os.getcwd()+'/media/upload.csv')
-        ltColumns  = sorted(list(df.columns))
+        dfdp = pd.read_csv(os.getcwd()+'/media/upload.csv')
+        ltColumns  = sorted(list(dfdp.columns))
         ltColumnsToMatch  = [ key for key in request.POST.keys() if key in ltColumns]
         ltColumnsToMatch  = sorted(ltColumnsToMatch)
-        df =  dfObjColConverter(df, ltColumnsToMatch)
-        df['compname'] = compNameGenerator(df, ltColumnsToMatch)
-        dfdb =  df.compname.drop_duplicates()
+        dfdp =  dfObjColConverter(dfdp, ltColumnsToMatch)
+        dfdp['compname'] = compNameGenerator(dfdp, ltColumnsToMatch)
+        pickleOut(dfdp, os.getcwd()+'/pkl/dfdp.pkl')
+        dfdb =  dfdp.compname.drop_duplicates()
         vectorizer = TfidfVectorizer(min_df=1, analyzer=ngrams)
         db_tf_idf_matrix = vectorizer.fit_transform(dfdb)
         knn = NearestNeighbors(n_neighbors=10 , metric = 'cosine' )
@@ -150,15 +151,14 @@ def vwDedupe(request):
                 temp = [D[r][c], dfdb.iloc[dbloc], dfdb.iloc[r]]
                 matches.append(temp)
 
-        dfmatches = pd.DataFrame(matches, columns = ['Kdistance','DatabaseData','QueryData'])
-        dfmatches = dfmatches[dfmatches['Kdistance'] > 0.000000001].sort_values('Kdistance', ascending = True)
-        resfname = os.getcwd()+'/pkl/results.pkl'
+        dfdpmatches = pd.DataFrame(matches, columns = ['Kdistance','DatabaseData','QueryData'])
+        dfdpmatches = dfdpmatches[(dfdpmatches['Kdistance'] > 0.000000001) & (dfdpmatches['Kdistance'] < 1)].sort_values('Kdistance', ascending = True)
+        resfname = os.getcwd()+'/pkl/dfdpmatches.pkl'
         os.remove(resfname)
-        pickleOut(dfmatches, resfname)
+        pickleOut(dfdpmatches, resfname)
         
 
-
-        response = redirect('/results')
+        response = redirect('/dpkdistance')
         return response
 
 
@@ -173,6 +173,46 @@ def vwDedupe(request):
             }
     return render(request, template, context)
 
+
+
+
+def vwDpKdistance(request):
+    if request.method == 'POST' :
+        KdistanceThold = float(request.POST['KdistanceThold'])
+        resfname = os.getcwd()+'/pkl/dfdpmatches.pkl'
+        dfdpmatches = pickleIn(resfname)
+        dfdp = pickleIn( os.getcwd()+'/pkl/dfdp.pkl')
+        dfdpmatchesthold = dfdpmatches[dfdpmatches['Kdistance'] < KdistanceThold]
+        dfdpdupid = dfMatchesTodDupID(dfdpmatchesthold)
+        dfdpOrigWithDupId = dfdpdupid.merge(dfdp, on = 'compname', how = 'inner')
+        pickleOut( dfdpOrigWithDupId, os.getcwd()+'/pkl/dfdpOrigWithDupId.pkl')
+
+        response = redirect('/dpresults')
+        return response
+
+
+    resfname = os.getcwd()+'/pkl/dfdpmatches.pkl'
+    dfdpmatches = pickleIn(resfname)
+    template = "datadrivenapp/dpKdistance.html"
+    context = { 
+            'dfdpmatches': dfdpmatches,
+            }
+    return render(request, template, context)
+
+
+def vwDpResults(request):
+
+    resfname = os.getcwd()+'/pkl/dfdpOrigWithDupId.pkl'
+    dfdpOrigWithDupId = pickleIn(resfname)
+    ltColumns = list(dfdpOrigWithDupId.columns)
+
+
+    template = "datadrivenapp/dpResults.html"
+    context = { 
+            'dfdpOrigWithDupId': dfdpOrigWithDupId,
+            'ltColumns': ltColumns,
+            }
+    return render(request, template, context)
 
 
 def vwResults(request):

@@ -35,18 +35,17 @@
                 <thead class="thead-light" style="width:100%">    
                     <tr class="mdl-data-table__cell--non-numeric">
                         <!-- <th>CTR</th> -->
-                        <th>Kdistance</th>
-                        <th>Composite Name</th>
-                        <th>QueryData</th>
+		       {% for it in ltColumns %}
+				<th>{{it}}</th>
+		       {% endfor %} 
                     </tr> 
                 </thead>
                 <tbody>
-               {% for i,row in dfmatches.iterrows %}
-
+               {% for i,row in dfdpOrigWithDupId.iterrows %}
                 <tr class="mdl-data-table__cell--non-numeric">
-                <td>{{row.Kdistance}}</td>
-                <td>{{row.DatabaseData}}</td>
-                <td>{{row.QueryData}}</td>
+		       {% for it in row %}
+				<td>{{it}}</td>
+		       {% endfor %} 
                    </tr> 
                {% endfor %} 
 

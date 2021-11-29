@@ -31,6 +31,11 @@
         
         <div class="box-body">
             <div class="form-group">
+                        <form method="post" action="">
+			{% csrf_token %}
+	    		<input type="text" name="KdistanceThold">
+                  <button type="submit" class="btn btn-primary"> Kdistance</button>
+                        </form>
             <table id="resultsTbl" class="table table-striped table-bordered" style="width:100%">
                 <thead class="thead-light" style="width:100%">    
                     <tr class="mdl-data-table__cell--non-numeric">
@@ -41,7 +46,7 @@
                     </tr> 
                 </thead>
                 <tbody>
-               {% for i,row in dfmatches.iterrows %}
+               {% for i,row in dfdpmatches.iterrows %}
 
                 <tr class="mdl-data-table__cell--non-numeric">
                 <td>{{row.Kdistance}}</td>

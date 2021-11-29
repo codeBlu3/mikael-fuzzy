@@ -5,15 +5,13 @@ from django.conf.urls.static import static
 from datadrivenapp.views import *
 
 urlpatterns = [
-	## DASHBOARD URLS ##
 	url(r'^$', index, name='index'),
-	## SETUP URLS ##
 	url(r'^setup/$', index_setup, name='index_setup'),
 	url(r'^dedupe/$', vwDedupe, name='dedupe'),
+	url(r'^dpkdistance/$', vwDpKdistance, name='dpkdistance'),
+	url(r'^dpresults/$', vwDpResults, name='dpresults'),
 	url(r'^results/$', vwResults, name='results'),
-	## VIEWING URLS ##
 	url(r'^view-data/$', index_view, name='index_view'),
-	## TRANSACTIONS URLS ##
 	url(r'^transaction/$', index_trans, name='index_trans')
 ]
 
